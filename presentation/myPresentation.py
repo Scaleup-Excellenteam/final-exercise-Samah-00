@@ -18,7 +18,7 @@ class MyPresentation:
 
     def __post_init__(self):
         """
-        Initializes the slides dictionary.
+        Initializes the slides' dictionary.
         """
         self.slides = {}
 
@@ -39,6 +39,10 @@ class MyPresentation:
                 for run in paragraph.runs
                 if run.text.strip()
             ]
+
+            # Ignore the slide if there is no text
+            if not slide_text_boxes:
+                continue
 
             # Create a MySlide object and store it in the slides dictionary
             self.slides[slide_number] = MySlide(slide_number, slide_text_boxes)
