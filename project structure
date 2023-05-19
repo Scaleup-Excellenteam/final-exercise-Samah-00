@@ -2,5 +2,5 @@ final-exercise-Samah-00/
 ├── main.py
 ├── presentation/
 │   ├── __init__.py
-│   ├── presentation.py
+│   ├── myPresentation.py
 │   └── mySlide.py

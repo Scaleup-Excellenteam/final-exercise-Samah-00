@@ -1,8 +1,9 @@
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass
-class Slide:
+class MySlide:
     slide_number: int
     text_boxes: List[str]
 
