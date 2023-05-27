@@ -48,7 +48,7 @@ class MySlide:
                     prompt=prompt,
                     max_tokens=max_tokens,
                     stop=None,
-                ), timeout=30)  # Timeout set to 30 seconds
+                ), timeout=60)  # Timeout set to 60 seconds
             except openai.error.AuthenticationError:
                 print(error_messages["authentication"])
                 return ""
