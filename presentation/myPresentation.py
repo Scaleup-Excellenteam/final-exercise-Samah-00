@@ -9,7 +9,12 @@ from presentation.mySlide import MySlide
 @dataclass
 class MyPresentation:
     """
-    Class representing a PowerPoint presentation.
+    Represents a PowerPoint presentation.
+
+    Attributes:
+        filepath (str): The file path of the PowerPoint presentation.
+        explanations (namedtuple): Named tuple to store slide explanations. Defaults to None.
+        slides (Dict[int, MySlide]): Dictionary to store slide objects. Defaults to None.
     """
 
     filepath: str
@@ -25,6 +30,8 @@ class MyPresentation:
     def parse(self):
         """
         Parses the PowerPoint presentation to extract slide data.
+
+        Creates instances of the MySlide class for each slide and stores them in the self.slides dictionary.
         """
         prs = Presentation(self.filepath)
         for slide_number, slide in enumerate(prs.slides, start=1):
