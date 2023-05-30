@@ -7,9 +7,9 @@ import os
 from dotenv import load_dotenv
 
 # before running the code, please make sure that the environment variables section includes:
-# name: OPENAI_API_KEY, value: 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
+# name: OPENAI_API_KEY, value: <value of key>
 # Load environment variables from .env file
-load_dotenv()
+# load_dotenv()
 
 model = 'text-davinci-003'
 max_tokens = 1000
