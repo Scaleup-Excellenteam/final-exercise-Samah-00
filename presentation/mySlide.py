@@ -3,8 +3,14 @@ from dataclasses import dataclass
 from typing import List
 import openai
 import time
+import os
+from dotenv import load_dotenv
 
-openai.api_key = "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"
+# before running the code, please make sure that the environment variables section includes:
+# name: OPENAI_API_KEY, value: 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
+# Load environment variables from .env file
+load_dotenv()
+
 model = 'text-davinci-003'
 max_tokens = 1000
 error_messages = {
@@ -35,6 +41,8 @@ class MySlide:
         Returns:
             str: The generated explanation for the slide.
         """
+        # Get the API key from the environment variable
+        openai.api_key = os.getenv("OPENAI_API_KEY")
         # Construct the prompt using the slide's text
         prompt = self.construct_prompt()
 
@@ -43,12 +51,12 @@ class MySlide:
         while not response:
             try:
                 print(f"Processing Slide # {self.slide_number}")
-                response = await asyncio.wait_for(openai.Completion.create(
+                response = openai.Completion.create(
                     model=model,
                     prompt=prompt,
                     max_tokens=max_tokens,
                     stop=None,
-                ), timeout=30)  # Timeout set to 30 seconds
+                )
             except openai.error.AuthenticationError:
                 print(error_messages["authentication"])
                 return ""
