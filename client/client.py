@@ -1,17 +1,16 @@
+import logging
+
 import requests
 from datetime import datetime
 from dataclasses import dataclass
-import time
 
-API_BASE_URL = "http://localhost:8080"
-FILE_TO_PROCESS = '..\\End_of_course_exercise.pptx'
+
 messages = {
-    "uid_message": "Uploaded file with UID:",
     "error_retrieve_data": "Failed to retrieve status:",
     "upload_exception": "Upload failed:",
     "uid_exception": "UID not found",
     "status_exception": "Failed to retrieve status:",
-    "file_exception": "file_path argument is required."
+    "file_exception": "file_path argument is required and file should be of type .pptx."
 }
 
 
@@ -38,6 +37,10 @@ class Status:
         return self.status == 'done'
 
 
+def is_valid_filepath(file_path):
+    return file_path is None or not file_path.endswith(".pptx")
+
+
 class SystemClient:
     """
     This class provides a client interface for interacting with the web app system.
@@ -54,14 +57,14 @@ class SystemClient:
 
     def upload(self, file_path=None):
         """
-        upload(file_path: str) -> str: Uploads a file to the web app.
+        upload(file_path: str) -> str: Checks if the file is valid and uploads a file to the web app.
         :param: file_path: The path of the file to upload.
         :return: the UID (unique identifier) of the uploaded file, if the upload was successful.
-        :raises: an exception if the upload fails.
         """
-        if file_path is None:
-            # Handle the case where file_path is not provided
-            raise ValueError(messages['file_exception'])
+        if not is_valid_filepath(file_path):
+            # Handle the case where file_path is not provided or is not supported
+            logging.warning(messages['file_exception'])
+            return None
 
         upload_url = f"{self.base_url}/upload"
         with open(file_path, 'rb') as file:
@@ -86,24 +89,3 @@ class SystemClient:
         data = response.json()
         timestamp = datetime.strptime(data['timestamp'], '%Y%m%d%H%M%S')
         return Status(data['status'], data['filename'], timestamp, data['explanation'])
-
-
-def run_system_test(client, file_path=None):
-    uid = client.upload(file_path)
-    print(f"{messages['uid_message']} {uid}")
-
-    while True:
-        try:
-            status = client.status(uid)
-            print(f"Status: {status.status}")
-            print(f"Filename: {status.filename}")
-            print(f"Timestamp: {status.timestamp}")
-            print(f"Explanation: {status.explanation}")
-        except Exception as e:
-            print(f"{messages['error_retrieve_data']} {e}")
-        time.sleep(20)  # Sleep for 20 seconds between iterations
-
-
-if __name__ == '__main__':
-    client = SystemClient(API_BASE_URL)
-    run_system_test(client, FILE_TO_PROCESS)
