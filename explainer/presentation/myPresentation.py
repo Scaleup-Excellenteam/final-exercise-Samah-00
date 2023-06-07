@@ -1,9 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from collections import namedtuple
 from typing import Dict
 from pptx import Presentation
 
-from presentation.mySlide import MySlide
+from explainer.presentation.mySlide import MySlide
 
 
 @dataclass
@@ -19,13 +19,7 @@ class MyPresentation:
 
     filepath: str
     explanations: namedtuple = None
-    slides: Dict[int, MySlide] = None
-
-    def __post_init__(self):
-        """
-        Initializes the slides' dictionary.
-        """
-        self.slides = {}
+    slides: Dict[int, MySlide] = field(default_factory=dict)
 
     def parse(self):
         """
@@ -33,7 +27,12 @@ class MyPresentation:
 
         Creates instances of the MySlide class for each slide and stores them in the self.slides dictionary.
         """
-        prs = Presentation(self.filepath)
+        try:
+            prs = Presentation(f"{self.filepath}")
+        except Exception as e:
+            print(f"Error: {e}")
+            return
+
         for slide_number, slide in enumerate(prs.slides, start=1):
             slide_obj = prs.slides[slide_number - 1]  # Access slide object using slide number - 1
 

@@ -4,12 +4,10 @@ from typing import List
 import openai
 import time
 import os
-from dotenv import load_dotenv
+import logging
 
 # before running the code, please make sure that the environment variables section includes:
 # name: OPENAI_API_KEY, value: <value of key>
-# Load environment variables from .env file
-# load_dotenv()
 
 model = 'text-davinci-003'
 max_tokens = 1000
@@ -50,7 +48,7 @@ class MySlide:
         response = None
         while not response:
             try:
-                print(f"Processing Slide # {self.slide_number}")
+                logging.debug(f"Processing Slide # {self.slide_number}")
                 response = openai.Completion.create(
                     model=model,
                     prompt=prompt,
@@ -58,16 +56,16 @@ class MySlide:
                     stop=None,
                 )
             except openai.error.AuthenticationError:
-                print(error_messages["authentication"])
+                logging.error(error_messages["authentication"])
                 return ""
             except asyncio.TimeoutError:
-                print(error_messages["timeout"])
+                logging.error(error_messages["timeout"])
                 return ""  # Return an empty string in case of a timeout
             except openai.error.RateLimitError:
-                print(error_messages["rate_limit"])
+                logging.warning(error_messages["rate_limit"])
                 time.sleep(60)  # Wait for 60 seconds before making the next request
             except Exception as e:
-                print(f"{error_messages['exception']} {e}")
+                logging.error(f"{error_messages['exception']} {e}")
                 return ""  # Return an empty string in case of an error
 
         # Extract the AI's reply from the response
