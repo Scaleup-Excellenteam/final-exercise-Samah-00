@@ -1,6 +1,6 @@
 final-exercise-Samah-00/
 ├──explainer/
-    ├── main.py
+    ├── explainer.py
     ├── variables.env
     ├── presentation/
     │   ├── __init__.py

@@ -10,7 +10,7 @@ import logging
 # name: OPENAI_API_KEY, value: <value of key>
 
 model = 'text-davinci-003'
-max_tokens = 1000
+max_tokens = 4000
 error_messages = {
     "rate_limit": "Rate limit exceeded. Waiting for 60 seconds...",
     "authentication": "Invalid API key.",
