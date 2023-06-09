@@ -19,7 +19,6 @@ def check_status(client, uid):
             print(f"Filename: {status.filename}")
             print(f"Timestamp: {status.timestamp}")
             print(f"Explanation: {status.explanation}")
-
             if status.is_done():
                 break  # Exit the loop if the status is 'done'
         except Exception as e:

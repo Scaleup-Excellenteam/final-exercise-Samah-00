@@ -1,54 +1,54 @@
 [
     [
         1,
-        "This slide is the final exercise for a course. It highlights the importance of understanding the material being taught in the course before completing the exercise. It also suggests that the exercise will be a comprehensive review of all the material covered."
+        "This slide is part of an end-of-course exercise, which is an assessment of the material covered in the course. It is likely designed to test the knowledge and understanding of the course material by the student."
     ],
     [
         2,
-        "Generative AI and software development are closely related. Generative AI can be used to create software that is able to autonomously generate complex and useful patterns and processes. Natural language processing can be used to allow developers to use natural language to interact with the software and command different actions, and can also be used in the creation of more user-friendly interfaces. Additionally, generative AI can be used to create new types of software solutions that may not have been possible without it, such as automating the creation of intelligent applications, machine learning models, and automated testing."
+        "Generative AI and natural language processing have many potential applications in software development. These include natural language processing for user interfaces, applications to automate software testing, automation of source code generation, and automation of software design and architecture. Natural language processing can also be used in automated bug triage and code review. Generative AI can be used to generate code, automatically refactor code, and programatically generate code for new features. Additionally, generative AI and natural language processing can be used to generate documentation, create unit tests, check for syntax errors, and identify code smells."
     ],
     [
         3,
-        "Generative AI and natural language processing can be used in a variety of software products to automate tasks. Natural language processing can be used to analyze texts or conversations, generate new texts, or interpret commands. Generative AI can be used to create new data from existing data and to develop models that can be used to make predictions. This could be used in software products for tasks such as automated customer support, natural language processing applications, personalized content curation, automated report generation, or other types of data mining applications."
+        "Generative AI and natural language processing can be used to create software products that can better understand and engage with users. Generative AI can be used to generate new content or features based upon existing data. Natural language processing can be used to process user input and give intelligent responses in a natural language, such as conversational agents. This can allow software products to have a more natural and intuitive user experience. Additionally, generative AI and natural language processing can be used to analyze user interactions and data to better understand their preferences and make intelligent recommendations."
     ],
     [
         4,
-        "This slide discusses the problem faced by students when features are added to their course after they have already worked on it. This puts students in a difficult situation, as they have to quickly adapt to the changes and relearn some aspects of the course, whether it be changes in the curriculum or how to use the tools they are given to effectively complete their projects. This situation arises because the use case of the course is not fully understood by the students until they have experienced it, leading to features being added after the course has started."
+        "The slide is discussing a real problem that students face: adding on features after a course is completed. This problem is likely caused by an insufficient understanding of the use case at the beginning of the course, as students may need to add features or make changes to their work once they have a better understanding of the expectations and what the project should deliver. AI can help with this problem by offering insights and suggestions based on the data collected while the course is in progress, allowing students to make better decisions sooner and reduce the need for making changes after the course is complete."
     ],
     [
         5,
-        "This slide provides an overview of the learning material to be covered in the presentation. It outlines the main topics to be discussed and gives an introduction to the materials to be presented. It is important to ensure the material is relevant and up-to-date in order to ensure maximum learning potential."
+        "This slide is designed to help provide learners with an overview of the course material. It outlines the different topics that will be discussed during the presentation, as well as the goals of each lesson. The materials provided during the course will help learners better understand the concepts, allowing them to put the knowledge into practice and become more effective professionals."
     ],
     [
         6,
-        "This slide describes the exercise metadata for an upcoming exercise. In this particular case, it is expected to be handed in about three weeks from now. Points will be taken away for ugly code, bad design, bad work methodology, ugly git hand in, late submission, errors in code, and lack of logs and tests."
+        "This slide outlines the criteria for which points will be taken off for when the exercise is due about three weeks from now. This includes having ugly code, such as lack of documentation or bad design, as well as having bad work methodology with ugly git hand-ins or handing in late. Additionally, points may be taken for errors in code or a lack of logs and tests."
     ],
     [
         7,
-        "This slide discusses the preparation that is needed to complete a home assignment for an interview. This could include researching the company, preparing answers to potential questions, and review any written material that has been provided. Additionally, it is important to practice for the interview by rehearsing answers and brushing up on relevant skills. Finally, make sure to take time to relax and be confident."
+        "This slide is about preparation for an interview and what to do before an interview. There are several steps that a person should take before an interview in order to better prepare themselves for the interview. This includes researching the company you are interviewing for, practicing answers to potential interview questions, preparing a portfolio or resume, and brushing up on industry knowledge. Taking these simple steps will help a person to be most successful during their interview."
     ],
     [
         8,
-        "The slide is instructing the reader to understand an assignment by carefully reading it and understanding the input and output. This helps to ensure that the assignment is completed correctly, in order to achieve the desired results."
+        "This slide is about understanding an assignment. It suggests that you read the assignment carefully, in order to gain an understanding of what's expected in terms of input and output. This can help you plan out what needs to be done in order to complete the assignment properly."
     ],
     [
         9,
-        "This slide is about introducing new technology into a project. It emphasizes the importance of understanding the big picture and the potential use cases of the technology to help inform decision-making. It encourages looking for similarities between the new technology and ones the team is already familiar with, and taking the time to understand how the new tech will affect the product."
+        "This slide is about the importance of understanding the big picture of a new technology before using it in a project. It suggests that one should be aware of the use cases of the tech, and consider how it will effect your product. This will help ensure that the new technology is properly utilized for the project."
     ],
     [
         10,
-        "Visual design is the process of creating layouts, colors, fonts, and other visual elements to communicate and support a message or concept. This includes choosing the right colors, font styles, images, and other visual elements that work together to create a cohesive story and convey the desired message. Visual design plays an important role in branding, user experience, and marketing."
+        "Visual design focuses on creating a visually pleasing user experience on a website, web application, or software platform. It involves understanding how space, aesthetics, color, typography, and imagery all play a role in providing a pleasing design that can help a user to navigate and interact with the product. Visual design also includes principles of user interface (UI) design, which apply to developing graphical design elements such as buttons, menus, and layout."
     ],
     [
         11,
-        "This slide is about the design review process, which is an important part of the software development cycle. In software engineering, design review is the evaluation of the design documents or components of the system by qualified people other than the designers. It is also known as peer review as it helps to ensure that the design goals, product requirements, and other project-related deliverables are met. The design review process also ensures that the product meets the quality standards and conforms to the applicable standards and guidelines."
+        "This slide is about design review. It is an important step in software development that involves a team of developers, designers, and other stakeholders examining the design of a software project before it is released. Design reviews are used to spot any potential issues, and to ensure that the design meets the needs of the target audience. They can be conducted face-to-face or remotely, and should include an interactive discussion of the design and its intended purpose."
     ],
     [
         12,
-        "This slide breaks down a project into its individual tasks. It is a visualization tool that helps us better understand the elements required to complete a project, as well as the order in which each task should be completed. It can help both project managers and team members focus on their respective deliverables, while highlighting any gaps or roadblocks that need to be addressed."
+        "This slide presents a list of tasks to be done. The tasks are broken down and organized into areas of focus and activities. Each task should be evaluated based on complexity, difficulty, and the necessary resources to complete it. This helps to make it easier to plan and manage a project by giving a clear understanding of the goals, tasks, and timeline."
     ],
     [
         13,
-        "This slide is a message of encouragement and congratulations, wishing the viewer success. It implies that the viewer is about to embark on an endeavor and is being wished good luck and success in the undertaking."
+        "This slide is saying that we wish the audience good luck on their future endeavors. It's a kind way of wishing them success and encouraging them to persevere."
     ]
 ]

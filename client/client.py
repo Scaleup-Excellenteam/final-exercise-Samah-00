@@ -38,7 +38,7 @@ class Status:
 
 
 def is_valid_filepath(file_path):
-    return file_path is None or not file_path.endswith(".pptx")
+    return not (file_path is None or not file_path.endswith(".pptx"))
 
 
 class SystemClient:

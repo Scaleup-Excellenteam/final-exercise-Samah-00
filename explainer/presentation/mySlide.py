@@ -68,11 +68,8 @@ class MySlide:
                 logging.error(f"{error_messages['exception']} {e}")
                 return ""  # Return an empty string in case of an error
 
-        # Extract the AI's reply from the response
-        if response and response.choices:
-            reply = response.choices[0].text.strip()
-        else:
-            reply = ""  # If no response received
+        # Extract the AI's reply from the response or empty string if no response received
+        reply = response.choices[0].text.strip() if response and response.choices else ""
 
         return reply
 

@@ -24,7 +24,7 @@ def generate_filename(uid, original_filename):
 
         Returns:
             str: New filename with the format 'original_filename_timestamp_uid'.
-        """
+    """
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     return f"{''.join(original_filename.split('.')[:-1])}_{timestamp}_{uid}.{original_filename.split('.')[-1]}"
 
@@ -36,7 +36,7 @@ def save_file(file, filename):
        Args:
            file (FileStorage): Uploaded file object.
            filename (str): Filename to save the file as.
-       """
+    """
     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 
@@ -50,7 +50,7 @@ def find_files(files, uid):
 
         Returns:
             List[str]: List of filenames that contain the UID.
-        """
+    """
     # the list comprehension iterates over files and adds a file if it contains the uid in its name
     matching_files = [file for file in files if uid in file]
     return matching_files
@@ -67,7 +67,7 @@ def upload():
 
         Returns:
             Response: JSON response with the UID of the upload.
-        """
+    """
     if 'file' not in request.files:
         return jsonify({'error': 'No file attached'}), 400
 
@@ -96,7 +96,7 @@ def status(uid):
 
         Returns:
             Response: JSON response with the status, original filename, timestamp, and explanation (if available).
-        """
+    """
     upload_files = os.listdir(app.config['UPLOAD_FOLDER'])
     matching_files = find_files(upload_files, uid)
 
