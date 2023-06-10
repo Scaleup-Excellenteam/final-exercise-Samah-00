@@ -3,7 +3,7 @@ from collections import namedtuple
 from typing import Dict
 from pptx import Presentation
 
-from .mySlide import MySlide
+from .my_slide import MySlide
 
 
 @dataclass

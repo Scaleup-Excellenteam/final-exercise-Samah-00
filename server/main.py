@@ -4,14 +4,14 @@ import uuid
 from datetime import datetime
 from flask import Flask, request, jsonify
 
+from utilities import dir_utils
+
 DEFAULT_PORT = 8080
 
 # create an instance of the Flask class and assigns it to the variable app
 app = Flask(__name__)
-UPLOAD_FOLDER = '..\\uploads'
-OUTPUT_FOLDER = '..\\outputs'
 # set the configuration parameter 'UPLOAD_FOLDER' in app object to the value of UPLOAD_FOLDER
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = dir_utils.UPLOAD_FOLDER
 
 
 def generate_filename(uid, original_filename):
@@ -97,7 +97,7 @@ def status(uid):
         Returns:
             Response: JSON response with the status, original filename, timestamp, and explanation (if available).
     """
-    upload_files = os.listdir(app.config['UPLOAD_FOLDER'])
+    upload_files = dir_utils.get_files_list(app.config['UPLOAD_FOLDER'])
     matching_files = find_files(upload_files, uid)
 
     if not matching_files:
@@ -106,13 +106,12 @@ def status(uid):
     filename = matching_files[0]
     timestamp = filename.split('_')[-2]     # retrieve the timestamp from the filename
 
-    output_folder = OUTPUT_FOLDER
-    output_files = os.listdir(output_folder)
+    output_files = dir_utils.get_files_list(dir_utils.OUTPUT_FOLDER)
     matching_output_files = find_files(output_files, uid)
 
     if matching_output_files:
         output_filename = matching_output_files[0]
-        with open(os.path.join(output_folder, output_filename)) as f:
+        with open(os.path.join(dir_utils.OUTPUT_FOLDER, output_filename)) as f:
             explanation = json.load(f)
         curr_status = 'done'
     else:

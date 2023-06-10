@@ -5,15 +5,16 @@ import asyncio
 import time
 import logging
 
-from presentation.myPresentation import MyPresentation
+from presentation.my_presentation import MyPresentation
+from utilities import dir_utils
 
 
-UPLOAD_FOLDER = '..\\uploads'
-OUTPUT_FOLDER = '..\\outputs'
 PROCESSED_FILES = set()
 messages = {
     "no_unprocessed_files": "No unprocessed files found. Waiting for new files...",
-    "invalid_file": "Invalid file path or unsupported file extension."
+    "invalid_file": "Invalid file path or unsupported file extension.",
+    "process_success": "File processed successfully: ",
+    "saved": "Explanation saved: "
 }
 
 
@@ -53,8 +54,9 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='{asctime} {levelname} {message}', style='{')
 
     while True:
-        # Scan the uploads folder for unprocessed files
-        unprocessed_files = [file for file in os.listdir(UPLOAD_FOLDER) if file not in PROCESSED_FILES]
+        # Scan the uploads' folder for unprocessed files
+        unprocessed_files = [file for file in dir_utils.get_files_list(dir_utils.UPLOAD_FOLDER)
+                             if file not in PROCESSED_FILES]
 
         if not unprocessed_files:
             # If no unprocessed files found, print a message and continue to the next iteration
@@ -64,7 +66,7 @@ if __name__ == '__main__':
 
         for file_name in unprocessed_files:
             # Get the full file path
-            file_path = os.path.join(UPLOAD_FOLDER, file_name)
+            file_path = os.path.join(dir_utils.UPLOAD_FOLDER, file_name)
 
             # # Check if the file exists and has the correct extension
             if os.path.isfile(file_path) and os.path.splitext(file_name)[1].lower() == ".pptx":
@@ -84,13 +86,13 @@ if __name__ == '__main__':
             PROCESSED_FILES.add(file_name)
 
             # Save the explanation JSON in the outputs folder
-            output_file_path = os.path.join(OUTPUT_FOLDER, os.path.splitext(file_name)[0] + '.json')
+            output_file_path = os.path.join(dir_utils.OUTPUT_FOLDER, os.path.splitext(file_name)[0] + '.json')
             with open(output_file_path, 'w') as f:
                 json.dump(presentation.explanations, f, indent=4)
 
             # Print debugging messages
-            logging.info(f"File processed successfully: {file_name}")
-            logging.info(f"Explanation saved: {output_file_path}")
+            logging.info(f"{messages['process_success']}{file_name}")
+            logging.info(f"{messages['saved']}{output_file_path}")
 
         # Sleep for a few seconds before the next iteration
         time.sleep(10)
