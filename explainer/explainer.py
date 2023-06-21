@@ -68,7 +68,7 @@ if __name__ == '__main__':
             # Get the full file path
             file_path = os.path.join(dir_utils.UPLOAD_FOLDER, file_name)
 
-            # # Check if the file exists and has the correct extension
+            # Check if the file exists and has the correct extension
             if os.path.isfile(file_path) and os.path.splitext(file_name)[1].lower() == ".pptx":
                 # Process the file
                 try:
