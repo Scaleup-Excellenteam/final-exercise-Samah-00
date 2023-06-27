@@ -47,5 +47,8 @@ class Upload(Base):
     user = relationship("User", back_populates="uploads")
 
 
+# Drop the existing tables if they exist
+Base.metadata.drop_all(engine)
+
 # Create the database tables if they don't exist
 Base.metadata.create_all(engine)
