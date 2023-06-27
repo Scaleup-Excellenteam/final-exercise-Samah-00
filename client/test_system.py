@@ -7,7 +7,8 @@ GOOD_FILE = '..\\End_of_course_exercise.pptx'
 BAD_FILE = '..\\End_of_course_exercise.txt'
 
 messages = {
-    "uid_message": "Uploaded file with UID: "
+    "uid_message": "Uploaded file with UID: ",
+    "error_retrieve_data": "Error retrieving data:"
 }
 
 

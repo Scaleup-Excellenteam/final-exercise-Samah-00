@@ -3,9 +3,11 @@ import os
 import uuid
 from datetime import datetime
 from flask import Flask, request, jsonify
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
-from server import TIME_FORMAT, DEFAULT_PORT, Status, STATUS_VALUES
-from utilities import dir_utils, file_utils
+from server import TIME_FORMAT, DEFAULT_PORT
+from utilities import dir_utils, file_utils, request_utils, status_utils
 from database.database import session, User, Upload
 
 
@@ -56,6 +58,21 @@ def find_files(files, uid):
     return matching_files
 
 
+def get_explanation_from_file(output_filename):
+    """
+    Retrieve the explanation from the output file.
+
+    Args:
+        output_filename (str): Name of the output file.
+
+    Returns:
+        Any: The retrieved explanation.
+    """
+    with open(os.path.join(dir_utils.OUTPUT_FOLDER, output_filename)) as f:
+        explanation = json.load(f)
+    return explanation
+
+
 def create_user(email):
     """
     Create a new User object if it doesn't exist already based on the provided email.
@@ -86,28 +103,13 @@ def create_upload(file, uid, filename, user):
     Returns:
         Upload: The created Upload object.
     """
-    new_upload = Upload(uid=uid, filename=filename, upload_time=datetime.now(), user=user)
+    new_upload = Upload(uid=uid, filename=filename, upload_time=datetime.now(), user=user, status='pending')
     session.add(new_upload)
     session.commit()
     return new_upload
 
 
-def calculate_finish_time(start_time):
-    """
-    Calculate the finish time based on the current time and the start time.
-
-    Args:
-        start_time (datetime): The start time of the upload.
-
-    Returns:
-        str: The finish time formatted as a string.
-    """
-    current_time = datetime.now()
-    finish_time = start_time + (current_time - start_time)
-    return finish_time.strftime(TIME_FORMAT)
-
-
-@app.route('/new_upload', methods=['POST'])
+@app.route('/upload', methods=['POST'])
 def upload():
     """
     Handle the new_upload endpoint.
@@ -129,7 +131,7 @@ def upload():
         Response: JSON response with the UID of the new_upload.
     """
     if 'file' not in request.files:
-        return jsonify({'error': 'No file attached'}), 400
+        return jsonify({file_utils.errors['not-found']}), request_utils.RETURN_VALUES['bad-request']
 
     file = request.files['file']
     uid = str(uuid.uuid4())     # create a unique identifier
@@ -146,101 +148,62 @@ def upload():
     return jsonify({'uid': uid})
 
 
-# @app.route('/status/<uid>', methods=['GET'])
-# def status(uid):
-#     """
-#         Handle the status endpoint.
-#
-#         This endpoint receives a GET request with a UID as a URL parameter. It checks the 'uploads' folder for
-#         files matching the given UID. If no matching file is found, it returns a JSON object with a 'not found'
-#         status. If a matching file is found, it checks the 'outputs' folder for a corresponding output file. If
-#         an output file exists, it retrieves the explanation from the file and sets the status to 'done'. If no
-#         output file is found, the status is set to 'pending'. The endpoint returns a JSON object with the status,
-#         original filename, timestamp, and explanation (if available).
-#
-#         Args:
-#             uid (str): Unique identifier for the upload.
-#
-#         Returns:
-#             Response: JSON response with the status, original filename, timestamp, and explanation (if available).
-#     """
-#     upload_files = dir_utils.get_files_list(app.config['UPLOAD_FOLDER'])
-#     matching_files = find_files(upload_files, uid)
-#
-#     if not matching_files:
-#         return jsonify({'status': 'not found'}), 404
-#
-#     filename = matching_files[0]
-#     timestamp = filename.split('_')[-2]     # retrieve the timestamp from the filename
-#
-#     output_files = dir_utils.get_files_list(dir_utils.OUTPUT_FOLDER)
-#     matching_output_files = find_files(output_files, uid)
-#
-#     if matching_output_files:
-#         output_filename = matching_output_files[0]
-#         with open(os.path.join(dir_utils.OUTPUT_FOLDER, output_filename)) as f:
-#             explanation = json.load(f)
-#         curr_status = 'done'
-#     else:
-#         explanation = None
-#         curr_status = 'pending'
-#
-#     return jsonify({
-#         'status': curr_status,
-#         'filename': '_'.join(filename.split('_')[:-2]),     # retrieve the original filename
-#         'timestamp': timestamp,
-#         'explanation': explanation
-#     })
-
-
-@app.route('/curr_status/<uid>', methods=['GET'])
+@app.route('/status/<uid>', methods=['GET'])
 def status(uid):
     """
-        Handle the curr_status endpoint.
+    Handle the status endpoint.
 
-        This endpoint receives a GET request with a UID as a URL parameter. It fetches the corresponding upload from
-        the database based on the provided UID. If no matching upload is found, it returns a JSON object with a
-        'not found' curr_status. If a matching upload is found, it checks if there is an associated output file in the
-        database. If an output file exists, it retrieves the explanation from the file and sets the curr_status to 'done'.
-        If no output file is found, the curr_status is set to 'pending'. The endpoint returns a JSON object with the curr_status,
-        original filename, timestamp, explanation (if available), and finish time (if available).
+    This endpoint receives a GET request with a UID as a URL parameter or a filename and an email as query parameters.
+    It fetches the corresponding upload from the database based on the provided UID, filename, and email.
+    If no matching upload is found, it returns a JSON object with a 'not found' status.
+    If a matching upload is found, it checks if there is an associated output file in the database.
+    If an output file exists, it retrieves the explanation from the file and sets the status to 'done'.
+    If no output file is found, the status is set to 'pending'.
+    The endpoint returns a JSON object with the status, original filename, timestamp, explanation (if available),
+    and finish time (if available).
 
-        Args:
-            uid (str): Unique identifier for the upload.
+    Args:
+        uid (str): Unique identifier for the upload.
 
-        Returns:
-            Response: JSON response with the curr_status, original filename, timestamp, explanation (if available),
-            and finish time (if available).
+    Returns:
+        Response: JSON response with the status, original filename, timestamp, explanation (if available),
+        and finish time (if available).
     """
-    # Fetch the upload from the database based on the provided UID
+    # Find the upload with the given UID
     upload = session.query(Upload).filter_by(uid=uid).first()
-
     if not upload:
-        return jsonify({'status': STATUS_VALUES['not_found']}), 404
+        # Upload not found
+        return jsonify({'status': 'not found'})
 
-    # Retrieve the relevant data from the upload object
+    # Get the status, original filename, and upload timestamp
+    status = upload.status
     filename = upload.filename
     timestamp = upload.upload_time.strftime(TIME_FORMAT)
 
-    # Check if an output file exists for the upload
-    output_files = dir_utils.get_files_list(dir_utils.OUTPUT_FOLDER)
-    matching_output_files = find_files(output_files, uid)
-    if matching_output_files:
-        output_filename = matching_output_files[0]
-        with open(os.path.join(dir_utils.OUTPUT_FOLDER, output_filename)) as f:
-            explanation = json.load(f)
-        curr_status = STATUS_VALUES['done']
-        finish_time = calculate_finish_time(timestamp)
+    if status == 'done':
+        # Find the output file associated with the upload
+        output_files = find_files(os.listdir(dir_utils.OUTPUT_FOLDER), uid)
+        if output_files:
+            # Retrieve the explanation from the output file
+            explanation = get_explanation_from_file(output_files[0])
+        else:
+            explanation = None
     else:
         explanation = None
-        curr_status = STATUS_VALUES['pending']
-        finish_time = None
 
-    # Create a named tuple for the curr_status
-    curr_status = Status(status=curr_status, filename=filename, timestamp=timestamp,
-                         explanation=explanation, finish_time=finish_time)
+    # Prepare the response JSON object
+    response = {
+        'status': status,
+        'filename': filename,
+        'timestamp': timestamp,
+        'explanation': explanation
+    }
 
-    return jsonify(curr_status._asdict())
+    if upload.finish_time:
+        # Add finish time to the response if available
+        response['finish_time'] = upload.finish_time.strftime(TIME_FORMAT)
+    print(response)
+    return jsonify(response)
 
 
 if __name__ == '__main__':
