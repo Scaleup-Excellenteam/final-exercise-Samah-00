@@ -3,6 +3,7 @@ import os
 import uuid
 from datetime import datetime
 from flask import Flask, request, jsonify
+from sqlalchemy import desc
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -148,13 +149,51 @@ def upload():
     return jsonify({'uid': uid})
 
 
+def prepare_response(upload):
+    """
+    Prepare the response JSON object based on the upload.
+
+    Args:
+        upload (Upload): The upload object.
+
+    Returns:
+        dict: The response JSON object.
+    """
+    status = None
+    filename = ''
+    timestamp = datetime.now()
+    explanation = ''
+
+    if upload:
+        status = upload.status
+        filename = upload.filename
+        timestamp = upload.upload_time.strftime(TIME_FORMAT)
+
+        if status == 'done':
+            output_files = find_files(os.listdir(dir_utils.OUTPUT_FOLDER), upload.uid)
+            if output_files:
+                explanation = get_explanation_from_file(output_files[0])
+
+    response = {
+        'status': status,
+        'filename': filename,
+        'timestamp': timestamp,
+        'explanation': explanation
+    }
+
+    if upload and upload.finish_time:
+        response['finish_time'] = upload.finish_time.strftime(TIME_FORMAT)
+
+    return response
+
+
 @app.route('/status/<uid>', methods=['GET'])
 def status(uid):
     """
     Handle the status endpoint.
 
-    This endpoint receives a GET request with a UID as a URL parameter or a filename and an email as query parameters.
-    It fetches the corresponding upload from the database based on the provided UID, filename, and email.
+    This endpoint receives a GET request with a UID as a URL parameter.
+    It fetches the corresponding upload from the database based on the provided UID.
     If no matching upload is found, it returns a JSON object with a 'not found' status.
     If a matching upload is found, it checks if there is an associated output file in the database.
     If an output file exists, it retrieves the explanation from the file and sets the status to 'done'.
@@ -169,40 +208,41 @@ def status(uid):
         Response: JSON response with the status, original filename, timestamp, explanation (if available),
         and finish time (if available).
     """
-    # Find the upload with the given UID
     upload = session.query(Upload).filter_by(uid=uid).first()
     if not upload:
-        # Upload not found
         return jsonify({'status': 'not found'})
 
-    # Get the status, original filename, and upload timestamp
-    status = upload.status
-    filename = upload.filename
-    timestamp = upload.upload_time.strftime(TIME_FORMAT)
+    response = prepare_response(upload)
+    return jsonify(response)
 
-    if status == 'done':
-        # Find the output file associated with the upload
-        output_files = find_files(os.listdir(dir_utils.OUTPUT_FOLDER), uid)
-        if output_files:
-            # Retrieve the explanation from the output file
-            explanation = get_explanation_from_file(output_files[0])
-        else:
-            explanation = None
-    else:
-        explanation = None
 
-    # Prepare the response JSON object
-    response = {
-        'status': status,
-        'filename': filename,
-        'timestamp': timestamp,
-        'explanation': explanation
-    }
+@app.route('/get_latest_upload', methods=['GET'])
+def get_latest_upload():
+    """
+    Handle the get_latest_upload endpoint.
 
-    if upload.finish_time:
-        # Add finish time to the response if available
-        response['finish_time'] = upload.finish_time.strftime(TIME_FORMAT)
-    print(response)
+    This endpoint receives a GET request with 'filename' and 'email' as URL parameters.
+    It fetches the latest upload with the provided filename for the user with the provided email.
+    If no matching upload is found, it returns a JSON object with a 'not found' status.
+    If a matching upload is found, it returns a JSON object with the status, original filename, timestamp,
+    explanation (if available), and finish time (if available).
+
+    Returns:
+        Response: JSON response with the status, original filename, timestamp, explanation (if available),
+        and finish time (if available).
+    """
+    filename = request.args.get('filename')
+    email = request.args.get('email')
+
+    user = session.query(User).filter_by(email=email).first()
+    if not user:
+        return jsonify({'status': status_utils.STATUS_VALUES['not-found']})
+
+    latest_upload = session.query(Upload).filter_by(user=user, filename=filename).order_by(desc(Upload.upload_time)).first()
+    if not latest_upload:
+        return jsonify({'status': status_utils.STATUS_VALUES['not-found']})
+
+    response = prepare_response(latest_upload)
     return jsonify(response)
 
 

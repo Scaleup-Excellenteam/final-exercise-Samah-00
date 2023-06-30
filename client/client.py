@@ -34,6 +34,28 @@ def is_valid_filepath(file_path):
     return not (file_path is None or not file_path.endswith(".pptx"))
 
 
+def make_status_request(url, params):
+    """
+    Make a status request to the specified URL with the given parameters.
+
+    Args:
+        url (str): The URL to make the request to.
+        params (dict): The request parameters.
+
+    Returns:
+        dict: The JSON response data.
+
+    Raises:
+        Exception: If the request fails or returns an error status.
+    """
+    response = requests.get(url, params=params)
+    if response.status_code == request_utils.RETURN_VALUES['page-not-found']:
+        raise Exception(CLIENT_MESSAGES['uid_exception'])
+    elif response.status_code != request_utils.RETURN_VALUES['ok']:
+        raise Exception(f"{CLIENT_MESSAGES['status_exception']} {response.json()}")
+    return response.json()
+
+
 class SystemClient:
     """
     This class provides a client interface for interacting with the web app system.
@@ -71,21 +93,48 @@ class SystemClient:
 
     def status(self, uid, email=None, filename=None):
         """
-        status(uid: str, email: str = None, filename: str = None) -> Status: Retrieves the status of a file from the web app
-            based on the UID, email, and/or filename.
-        :param: uid: The UID (unique identifier) of the file to check the status of.
-        :param: email: The email address associated with the file (optional).
-        :param: filename: The original filename of the file (optional).
-        :return: a Status object representing the status of the file.
-        :raises: an exception if the UID is not found or if there is an error retrieving the status.
+        Retrieves the status of a file from the web app based on the UID, email, and/or filename.
+
+        Args:
+            uid (str): The UID (unique identifier) of the file to check the status of.
+            email (str, optional): The email address associated with the file.
+            filename (str, optional): The original filename of the file.
+
+        Returns:
+            Status: A Status object representing the status of the file.
+
+        Raises:
+            Exception: If the UID is not found or if there is an error retrieving the status.
         """
         status_url = f"{self.base_url}/status/{uid}"
         params = {'filename': filename, 'email': email}
-        response = requests.get(status_url, params=params)
-        if response.status_code == request_utils.RETURN_VALUES['page-not-found']:
-            raise Exception(CLIENT_MESSAGES['uid_exception'])
-        elif response.status_code != request_utils.RETURN_VALUES['ok']:
-            raise Exception(f"{CLIENT_MESSAGES['status_exception']} {response.json()}")
-        data = response.json()
+        data = make_status_request(status_url, params)
         timestamp = datetime.strptime(data['timestamp'], TIME_FORMAT)
         return Status(data['status'], data['filename'], timestamp, data['explanation'])
+
+    def get_latest_upload(self, filename=None, email=None):
+        """
+        Retrieves the latest upload with the provided filename for the user with the provided email.
+
+        Args:
+            filename (str, optional): The filename to search for.
+            email (str, optional): The email address of the user.
+
+        Returns:
+            Status: The status of the latest upload.
+
+        Raises:
+            Exception: If the UID is not found or if there is an error retrieving the status.
+        """
+        endpoint_url = f"{self.base_url}/get_latest_upload"
+        params = {'filename': filename, 'email': email}
+        data = make_status_request(endpoint_url, params)
+        try:
+            timestamp = datetime.strptime(data['timestamp'], TIME_FORMAT)
+        except Exception as e:
+            timestamp = datetime.now()
+        try:
+            explanation = data['explanation']
+        except:
+            explanation = ''
+        return Status(data['status'], filename, timestamp, explanation)
